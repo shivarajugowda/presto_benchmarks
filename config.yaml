@@ -1,0 +1,30 @@
+presto:
+  host: localhost
+  port: 8080
+  user: admin
+  recreatetables: true
+
+metricsstore:
+  enabled: false
+  user: postgres
+  password: 5uwbgdR9BuwRcK
+  host: localhost
+  port: 5432
+  database: benchmarks
+  recreatetables: false
+
+benchmarks:
+  location: ./benchmarks/
+
+run:
+  type: tpch         # Can be one of [ tpch, tpcds ]
+  connector: hive
+  sourcecatalog : tpch
+  size: tiny       # tiny, sf1 .. sf3000
+  fileformat:     # Hive connector file formats. Leave it empty to use default format
+  handledateasvarchar: true  #default false
+  distributed_join_sort: false
+  verifyresults: false
+  concurrency: 1
+  runs: 1
+
