@@ -22,25 +22,26 @@ class PrestoConnection:
         rows = self.run_query(sql)
         return sum(rows, [])  # flatten 2d to 1d
 
-    def getcolumns(self, catalog, schema, table):
-        sql = 'SELECT column_name FROM {}.information_schema.columns where table_catalog = \'{}\' and table_schema = \'{}\' and table_name = \'{}\' '.format(catalog, catalog, schema, table)
+    def getcolumnsInfo(self, catalog, schema, table):
+        sql = 'SELECT column_name, data_type FROM {}.information_schema.columns where table_catalog = \'{}\' and table_schema = \'{}\' and table_name = \'{}\' '.format(catalog, catalog, schema, table)
         rows = self.run_query(sql)
-        return sum(rows, [])  # flatten 2d to 1d
+        #return sum(rows, [[]])  # flatten 2d to 1d
+        return rows
 
     def createschema(self, catalog, schema):
-        self.run_query('CREATE SCHEMA IF NOT EXISTS "{}"."{}" '.format(catalog, schema))
+        self.run_query('CREATE SCHEMA IF NOT EXISTS {}.{} '.format(catalog, schema))
 
     def droptable(self, catalog, schema, tbl):
-        self.run_query('DROP TABLE IF EXISTS "{}"."{}"."{}" '.format(catalog, schema, tbl))
+        self.run_query('DROP TABLE IF EXISTS {}.{}.{} '.format(catalog, schema, tbl))
 
     def analyzetable(self, catalog, schema, tbl):
-        self.run_query('ANALYZE "{}"."{}"."{}" '.format(catalog, schema, tbl))
+        self.run_query('ANALYZE {}.{}.{} '.format(catalog, schema, tbl))
 
     def copytable(self, tbl, src_catalog, src_schema, cols, dest_catalog, dest_schema, fileformat):
         formatclause = ""
         if fileformat:
             formatclause = 'WITH (format = \'{}\')'.format(fileformat)
-        self.run_query('CREATE TABLE "{}"."{}"."{}" {} AS SELECT {} FROM "{}"."{}"."{}" '.format(
+        self.run_query('CREATE TABLE {}.{}.{} {} AS SELECT {} FROM {}.{}.{} '.format(
             dest_catalog, dest_schema, tbl, formatclause, cols, src_catalog, src_schema, tbl))
 
     def getclusterinfo(self):

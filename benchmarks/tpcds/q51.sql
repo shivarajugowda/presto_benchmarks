@@ -2,7 +2,7 @@ WITH
   web_v1 AS (
    SELECT
      "ws_item_sk" "item_sk"
-   , "d_date"
+   , "d_date" as d_date
    , "sum"("sum"("ws_sales_price")) OVER (PARTITION BY "ws_item_sk" ORDER BY "d_date" ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) "cume_sales"
    FROM
      ${database}.${schema}.web_sales
@@ -15,7 +15,7 @@ WITH
 , store_v1 AS (
    SELECT
      "ss_item_sk" "item_sk"
-   , "d_date"
+   , "d_date" as d_date
    , "sum"("sum"("ss_sales_price")) OVER (PARTITION BY "ss_item_sk" ORDER BY "d_date" ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) "cume_sales"
    FROM
      ${database}.${schema}.store_sales
@@ -30,7 +30,7 @@ FROM
   (
    SELECT
      "item_sk"
-   , "d_date"
+   , "d_date" as d_date
    , "web_sales"
    , "store_sales"
    , "max"("web_sales") OVER (PARTITION BY "item_sk" ORDER BY "d_date" ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) "web_cumulative"
@@ -39,7 +39,7 @@ FROM
      (
       SELECT
         (CASE WHEN ("web"."item_sk" IS NOT NULL) THEN "web"."item_sk" ELSE "store"."item_sk" END) "item_sk"
-      , (CASE WHEN ("web"."d_date" IS NOT NULL) THEN "web"."d_date" ELSE "store"."d_date" END) "d_date"
+      , (CASE WHEN ("web"."d_date" IS NOT NULL) THEN "web"."d_date" ELSE "store"."d_date" END) d_date
       , "web"."cume_sales" "web_sales"
       , "store"."cume_sales" "store_sales"
       FROM
